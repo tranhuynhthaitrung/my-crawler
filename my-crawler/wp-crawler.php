@@ -990,7 +990,7 @@ function wp_crawler_insert_post( $url, $source, $args ) {
   			$replace_string_1 = str_replace('/','-',$mystring_date);
 			echo 'replace_string_1 = '.$replace_string_1.'<br>'; 
 			$replace_string = str_replace('&nbsp;', '/ /', $replace_string_1);
-            echo 'replace_string = '.$replace_string.'<br>'; 
+            echo 'replace_string new = '.$replace_string.'<br>'; 
 			$split_string = preg_split('/ /', $replace_string);
             echo 'split_string = '.$split_string.'<br>';
 			$mydate = NULL;
@@ -999,14 +999,14 @@ function wp_crawler_insert_post( $url, $source, $args ) {
 			foreach ($split_string as $value)
 			{
 				echo 'value = '.$value.'<br>';
-				if (strpos($value, '-') !== false)
+				if (strpos($value, '-') !== false && is_null($mydate) &&  strlen($value) > 10)
 				{
-					$mydate = $value;
+					$mydate = trim($value);
 					$strdate = $mydate;					
 				}
-				if (strpos($value, ':') !== false) 
+				if (strpos($value, ':') !== false && is_null($mytime) && strlen($value) > 5) 
 				{
-					$mytime = $value;			
+					$mytime = trim($value);			
 				}
 				if(!is_null($mydate) && !is_null($mytime))	
 				{
@@ -1014,15 +1014,10 @@ function wp_crawler_insert_post( $url, $source, $args ) {
 				}
 			}
 			$strdate = $mydate.' '.$mytime;	
-			echo 'mytime = '.$mytime.'<br>';
-			echo 'mydate = '.$mydate.'<br>';
-			echo 'strdate new = '.$strdate.'<br>';
-			$mydatetime = date_create_from_format('d-m-Y H:i', $strdate);
-            echo 'mydatetime = '.date_format($mydatetime, 'd-m-Y H:i').'<br>';
+			$strdate = $mydate.' '.$mytime;	
+			$mydatetime = date_create($strdate);
 			$date = date_format($mydatetime, 'Y-m-d H:i:s');
             echo 'date = '.$date.'<br>';
-			$date = '13-08-2017 08:39:000';
-			echo $date.'<br>';
 		} else {
 			$date = '';
 		}
@@ -1089,10 +1084,12 @@ function wp_crawler_insert_post( $url, $source, $args ) {
 					if(empty($thumbnail_url))
 					{
 						//$thumbnail_url = 'http://104.155.188.212/wp-content/uploads/2016/10/Default_Thumbnail.png';
-						set_post_thumbnail( $post_id, 7516 );
+						echo 'Emtpy thumbnail - set default <br>';
+						set_post_thumbnail( $post_id, 192 );
 					}
 					else
 					{
+						echo 'Thumbnail'.$thumbnail_url.'<br>';
 						wp_crawler_set_featured_image( $post_id, $thumbnail_url, $url );
 					}
 				}
